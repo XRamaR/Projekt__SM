@@ -318,6 +318,40 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *htim)
+{
+	char value1[3];
+		  	      char value2[3];
+		  	      char value3[3];
+		  	      int value_i1,value_i2,value_i3;
+		  	   // HAL_UART_Receive(&huart3, &msg, 12, 100);//odebranie znaku
+
+		  	      value1[0] = msg[1];
+		  	      value1[1] = msg[2];
+		  	      value1[2] = msg[3];
+
+		  	    value2[0] = msg[5];
+		  	    	  	      value2[1] = msg[6];
+		  	    	  	      value2[2] = msg[7];
+
+		  	    	  	  value3[0] = msg[9];
+		  	    	  	  	  	      value3[1] = msg[10];
+		  	    	  	  	  	      value3[2] = msg[11];
+
+		  	      value_i1 = 10*(atoi(value1));
+		  	    value_i2 = 10*(atoi(value2));
+		  	  value_i3= 10*(atoi(value3));
+
+
+
+
+
+		  	  	  	 __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, value_i1);
+		  	       __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_3, value_i2);
+
+		  	       __HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_2, value_i3);
+
+}
 
 /* USER CODE END 4 */
 
