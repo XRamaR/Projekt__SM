@@ -55,6 +55,9 @@ float BH1750_lux_1;
 float BH1750_lux_2;
 int zmienna = 0;
 char msg[12];
+uint8_t rx_buff[4]; /**< bufor do wysylania */
+uint8_t tx_buff[4];	/**< bufor do odbioru */
+int n; /**< długosc ciagu przy USART_TX */
 int R = 500;
 int B = 500;
 int G = 500;
@@ -110,17 +113,26 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C2_Init();
   /* USER CODE BEGIN 2 */
+  HAL_UART_Receive_IT(&huart3, rx_buff, 4);
   BH1750_Init(&hi2c1);
   BH1750_Init(&hi2c2);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
   //HAL_TIM_Base_Start_IT(&htim2);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  HAL_UART_Receive_IT(&huart3, &msg, 12);
+      //! testowa obsługa USARTA od przycisku
+	  if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin)==GPIO_PIN_SET)
+	  {
+		  n=sprintf(tx_buff,"test");
+		  HAL_UART_Transmit_IT(&huart3, tx_buff, n);
+		  HAL_Delay(200);
+	  }
+	 // HAL_UART_Receive_IT(&huart3, &msg, 12);
 	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
 	 	  	  {
 	 		  	  BH1750_lux_int_1 = BH1750_lux_1;
@@ -195,12 +207,26 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *htim)
+//! przerwanie od USARTA sterujące tymczasowo diodami na płytce
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	char value1[3];
-	char value2[3];
-	char value3[3];
-	int value_i1,value_i2,value_i3;
+	if(rx_buff[3]=='R')
+		{
+		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
+		}
+	if(rx_buff[3]=='B')
+		{
+			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
+		}
+	if(rx_buff[3]=='G')
+		{
+			HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
+		}
+	HAL_UART_Receive_IT(&huart3, rx_buff, 4);
+	//char value1[3];
+	//char value2[3];
+	//char value3[3];
+	//int value_i1,value_i2,value_i3;
 	// HAL_UART_Receive(&huart3, &msg, 12, 100);//odebranie znaku
 
 //	value1[0] = msg[1];

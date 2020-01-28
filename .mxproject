@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/lenovo/Documents/Projekt_SM/Projekt__SM/Inc
+HeaderPath=C:/Users/lukja/OneDrive/Documents/Studia/Semestr 5/Systemy Mikroprocesorowe/Programy/Projekt_SM/Inc
 HeaderFiles=stm32f7xx_it.h;stm32f7xx_hal_conf.h;main.h;gpio.h;usart.h;usb_otg.h;i2c.h;
-SourcePath=C:/Users/lenovo/Documents/Projekt_SM/Projekt__SM/Src
+SourcePath=C:/Users/lukja/OneDrive/Documents/Studia/Semestr 5/Systemy Mikroprocesorowe/Programy/Projekt_SM/Src
 SourceFiles=stm32f7xx_it.c;stm32f7xx_hal_msp.c;main.c;gpio.c;usart.c;usb_otg.c;i2c.c;
 
 [PreviousLibFiles]
