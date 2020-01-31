@@ -59,6 +59,7 @@ char msg[12];
 uint8_t rx_buff[4]; /**< bufor do wysylania */
 uint8_t tx_buff[4];	/**< bufor do odbioru */
 int n; /**< długosc ciagu przy USART_TX */
+int jasnosc=0;
 int R = 500;
 int B = 500;
 int G = 500;
@@ -139,16 +140,35 @@ int main(void)
 		  HAL_Delay(200);
 	  }
 	 // HAL_UART_Receive_IT(&huart3, &msg, 12);
+	  	  if (jasnosc==1100){jasnosc=0;}
+	  	  if(jasnosc!=1100)
+	  	  {
+	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, jasnosc);
+	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, jasnosc);
+	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, jasnosc);
+	  		HAL_Delay(100);
 	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
 	 	  	  {
 	 		  	  BH1750_lux_int_1 = BH1750_lux_1;
-	 	  		  size = sprintf(buffer, "BH1750 Lux: %d", BH1750_lux_int_1);
+	 	  		 /* size = sprintf(buffer, "BH1750 Lux: %d", BH1750_lux_int_1);
 	 	  	  	  HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
 
-	 	  	  	 size = sprintf(buffer, ", %d\n\r", wypelnienie);
+	 	  	  	 size = sprintf(buffer, ", %d\n\r", jasnosc);
 	 	  	  	 HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
 	 	  	  	  HAL_Delay(200);
+*/
+	 		  	 size = sprintf(buffer, "%d, %d;\n", BH1750_lux_int_1,jasnosc);
+	 		  	 HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
+
+	 		  	// size = sprintf(buffer, ", %d\n\r", jasnosc);
+	 		  	 //HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
+	 		  	 HAL_Delay(100);
+
+	 	  	  	jasnosc=jasnosc+50;
+	 	  	    //HAL_Delay(1000);
 	           }
+	  	  }
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -247,6 +267,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	value3[0] = msg[9];
 	value3[1] = msg[10];
 	value3[2] = msg[11];
+
+	value_i1 = 10*(atoi(msg[1])*100+atoi(msg[2])*10+atoi(msg[3]));
+	value_i2 = 10*(atoi(msg[5])*100+atoi(msg[6])*10+atoi(msg[7]));
+	value_i3 = 10*(atoi(msg[9])*100+atoi(msg[10])*10+atoi(msg[11]));
+
 
 	value_i1 = 10*(atoi(value1));
 	value_i2 = 10*(atoi(value2));
