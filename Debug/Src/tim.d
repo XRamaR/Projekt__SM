@@ -1,4 +1,8 @@
-Src/system_stm32f7xx.o: ../Src/system_stm32f7xx.c \
+Src/tim.o: ../Src/tim.c ../Inc/tim.h ../Inc/main.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
+ ../Inc/stm32f7xx_hal_conf.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
+ ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_def.h \
  ../Drivers/CMSIS/Device/ST/STM32F7xx/Include/stm32f7xx.h \
  ../Drivers/CMSIS/Device/ST/STM32F7xx/Include/stm32f746xx.h \
  ../Drivers/CMSIS/Include/core_cm7.h \
@@ -7,10 +11,6 @@ Src/system_stm32f7xx.o: ../Src/system_stm32f7xx.c \
  ../Drivers/CMSIS/Include/cmsis_gcc.h \
  ../Drivers/CMSIS/Include/mpu_armv7.h \
  ../Drivers/CMSIS/Device/ST/STM32F7xx/Include/system_stm32f7xx.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h \
- ../Inc/stm32f7xx_hal_conf.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h \
- ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_def.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc_ex.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_exti.h \
@@ -33,6 +33,18 @@ Src/system_stm32f7xx.o: ../Src/system_stm32f7xx.c \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_ll_usb.h \
  ../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_pcd_ex.h
 
+../Inc/tim.h:
+
+../Inc/main.h:
+
+../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
+
+../Inc/stm32f7xx_hal_conf.h:
+
+../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h:
+
+../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_def.h:
+
 ../Drivers/CMSIS/Device/ST/STM32F7xx/Include/stm32f7xx.h:
 
 ../Drivers/CMSIS/Device/ST/STM32F7xx/Include/stm32f746xx.h:
@@ -48,14 +60,6 @@ Src/system_stm32f7xx.o: ../Src/system_stm32f7xx.c \
 ../Drivers/CMSIS/Include/mpu_armv7.h:
 
 ../Drivers/CMSIS/Device/ST/STM32F7xx/Include/system_stm32f7xx.h:
-
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal.h:
-
-../Inc/stm32f7xx_hal_conf.h:
-
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_rcc.h:
-
-../Drivers/STM32F7xx_HAL_Driver/Inc/stm32f7xx_hal_def.h:
 
 ../Drivers/STM32F7xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h:
 

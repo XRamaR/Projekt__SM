@@ -28,6 +28,7 @@
 "Src/syscalls.o"
 "Src/sysmem.o"
 "Src/system_stm32f7xx.o"
+"Src/tim.o"
 "Src/usart.o"
 "Src/usb_otg.o"
 "Startup/startup_stm32f746zgtx.o"

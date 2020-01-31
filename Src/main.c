@@ -21,6 +21,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "i2c.h"
+#include "tim.h"
 #include "usart.h"
 #include "usb_otg.h"
 #include "gpio.h"
@@ -112,11 +113,16 @@ int main(void)
   MX_USB_OTG_FS_PCD_Init();
   MX_I2C1_Init();
   MX_I2C2_Init();
+  MX_TIM3_Init();
+  MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart3, rx_buff, 4);
+  HAL_UART_Receive_IT(&huart3, msg, 12);
   BH1750_Init(&hi2c1);
   BH1750_Init(&hi2c2);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
+  HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
   //HAL_TIM_Base_Start_IT(&htim2);
 
   /* USER CODE END 2 */
@@ -210,7 +216,7 @@ void SystemClock_Config(void)
 //! przerwanie od USARTA sterujące tymczasowo diodami na płytce
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-	if(rx_buff[3]=='R')
+	/*if(rx_buff[3]=='R')
 		{
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 		}
@@ -221,32 +227,36 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 	if(rx_buff[3]=='G')
 		{
 			HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-		}
-	HAL_UART_Receive_IT(&huart3, rx_buff, 4);
-	//char value1[3];
-	//char value2[3];
-	//char value3[3];
-	//int value_i1,value_i2,value_i3;
+		}*/
+
+
+	char value1[3];
+    char value2[3];
+	char value3[3];
+	int value_i1,value_i2,value_i3;
 	// HAL_UART_Receive(&huart3, &msg, 12, 100);//odebranie znaku
 
-//	value1[0] = msg[1];
-//	value1[1] = msg[2];
-//	value1[2] = msg[3];
-//
-//	value2[0] = msg[5];
-//	value2[1] = msg[6];
-//	value2[2] = msg[7];
-//
-//	value3[0] = msg[9];
-//	value3[1] = msg[10];
-//	value3[2] = msg[11];
-//
-//	value_i1 = 10*(atoi(value1));
-//	value_i2 = 10*(atoi(value2));
-//	value_i3= 10*(atoi(value3));
-//
-//__HAL_TIM_SET_COMPARE(&htim3, TIM_CHANNEL_1, value_i1);
+	value1[0] = msg[1];
+	value1[1] = msg[2];
+	value1[2] = msg[3];
 
+	value2[0] = msg[5];
+	value2[1] = msg[6];
+	value2[2] = msg[7];
+
+	value3[0] = msg[9];
+	value3[1] = msg[10];
+	value3[2] = msg[11];
+
+	value_i1 = 10*(atoi(value1));
+	value_i2 = 10*(atoi(value2));
+	value_i3= 10*(atoi(value3));
+
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, value_i1);
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, value_i2);
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, value_i3);
+
+HAL_UART_Receive_IT(&huart3, msg, 12);
 }
 
 /* USER CODE END 4 */
