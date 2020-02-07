@@ -64,6 +64,8 @@ int wypelnienie = 50;
 int BH1750_lux_int_1;
 char buffer[40];
 uint8_t size;
+float J_z, J_f;
+int wyp;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -114,7 +116,7 @@ int main(void)
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
   HAL_UART_Receive_IT(&huart3, msg, 3);
-  BH1750_Init(&hi2c1);
+  BH1750_Init(&hi2c2);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
@@ -125,6 +127,7 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+  J_z=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
   while (1)
   {
       //! testowa obsługa USARTA od przycisku
@@ -143,25 +146,56 @@ int main(void)
 //	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, jasnosc);
 //	  		HAL_Delay(100);
 	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
-	 	  	  {
-	 		  	  BH1750_lux_int_1 = BH1750_lux_1;
-	 	  		 /* size = sprintf(buffer, "BH1750 Lux: %d", BH1750_lux_int_1);
-	 	  	  	  HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
+	 	  {
+	 		 BH1750_lux_int_1 = BH1750_lux_1;
 
-	 	  	  	 size = sprintf(buffer, ", %d\n\r", jasnosc);
-	 	  	  	 HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
-	 	  	  	  HAL_Delay(200);
-*/
-	 		  	 size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,jasnosc);
-	 		  	 HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
+	 		 J_f=J_z*((2000-BH1750_lux_1)/2000);
+	 		 wyp=J_f/(0.75);
+
+	 		 if(wyp>0 && wyp <=1000)
+	 		 {
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, wyp);
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
+	 		 }
+	 		 else if(wyp>1000)
+	 		 {
+	 			 wyp=1000;
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, wyp);
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
+	 		 }
+	 		 else
+	 		 {
+	 			 wyp=0;
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, wyp);
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
+	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
+	 		 }
+	 		//HAL_Delay(10);
+	 		//size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,wyp);
+	 		//HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
+
+	 	  }
+	 	  	  //{
+	 		  	  //BH1750_lux_int_1 = BH1750_lux_1;
+	 	  		  //size = sprintf(buffer, "BH1750 Lux: %d", BH1750_lux_int_1);
+	 	  	  	  //HAL_UART_Transmit_IT(&huart3,buffer, size);
+
+	 	  	  	 //size = sprintf(buffer, ", %d\n\r", jasnosc);
+	 	  	  	 //HAL_UART_Transmit_IT(&huart3, buffer, size);
+	 	  	  	 //HAL_Delay(200);
+
+	 		  	// size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,jasnosc);
+	 		  	// HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
 
 	 		  	// size = sprintf(buffer, ", %d\n\r", jasnosc);
 	 		  	 //HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
-	 		  	 HAL_Delay(1000);
+	 		  	 //HAL_Delay(1000);
 
 	 	  	  	//jasnosc=jasnosc+50;
 	 	  	    //HAL_Delay(1000);
-	           }
+	        //   }
 //	  	  }
 
     /* USER CODE END WHILE */
@@ -259,22 +293,32 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 	value_i1 = 10*(atoi(value1));
 
+	if(atoi(value1) <=100)
+	{
+		J_z=value_i1;
+	}
 
 	if(atoi(value1) == 999) //Night mode on
 	{
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 		NightMode=4;
-		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		wyp=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
 		size=sprintf(buffer,"NIGHT MODE ON\n\r");
 		HAL_UART_Transmit_IT(&huart3, buffer, size);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, wyp);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	}
 	if(atoi(value1) == 998) //Night mode off
 	{
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 		NightMode=10;
-		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		wyp=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
 		size=sprintf(buffer,"NIGHT MODE OFF\n\r");
 		HAL_UART_Transmit_IT(&huart3, buffer, size);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, wyp);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
+		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	}
 	if(atoi(value1) == 997) //State check
 	{
@@ -282,8 +326,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		{
 			BH1750_lux_int_1 = BH1750_lux_1;
 		}
-		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
-		size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,value_i1);
+		int state=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,state);
 		HAL_UART_Transmit_IT(&huart3,buffer, size);
 	}
 	if(atoi(value1) >100 && atoi(value1) < 997)
@@ -295,9 +339,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
 
-__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, value_i1);
-__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, value_i1*NightMode/10);
-__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, value_i1*NightMode/10);
+//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, value_i1);
+//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, value_i1*NightMode/10);
+//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, value_i1*NightMode/10);
 
 HAL_UART_Receive_IT(&huart3, msg, 3);
 	}
