@@ -53,19 +53,15 @@
 
 /* USER CODE BEGIN PV */
 float BH1750_lux_1;
-float BH1750_lux_2;
 int zmienna = 0;
-char msg[12];
+char msg[3];
 uint8_t rx_buff[4]; /**< bufor do wysylania */
 uint8_t tx_buff[4];	/**< bufor do odbioru */
 int n; /**< długosc ciagu przy USART_TX */
 int jasnosc=0;
-int R = 500;
-int B = 500;
-int G = 500;
+int NightMode=10;
 int wypelnienie = 50;
 int BH1750_lux_int_1;
-int BH1750_lux_int_2;
 char buffer[40];
 uint8_t size;
 /* USER CODE END PV */
@@ -117,9 +113,8 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM1_Init();
   /* USER CODE BEGIN 2 */
-  HAL_UART_Receive_IT(&huart3, msg, 12);
+  HAL_UART_Receive_IT(&huart3, msg, 3);
   BH1750_Init(&hi2c1);
-  BH1750_Init(&hi2c2);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
@@ -133,20 +128,20 @@ int main(void)
   while (1)
   {
       //! testowa obsługa USARTA od przycisku
-	  if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin)==GPIO_PIN_SET)
-	  {
-		  n=sprintf(tx_buff,"test");
-		  HAL_UART_Transmit_IT(&huart3, tx_buff, n);
-		  HAL_Delay(200);
-	  }
+//	  if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin)==GPIO_PIN_SET)
+//	  {
+//		  n=sprintf(tx_buff,"test");
+//		  HAL_UART_Transmit_IT(&huart3, tx_buff, n);
+//		  HAL_Delay(200);
+//	  }
 	 // HAL_UART_Receive_IT(&huart3, &msg, 12);
-	  	  if (jasnosc==1100){jasnosc=0;}
-	  	  if(jasnosc!=1100)
-	  	  {
-	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, jasnosc);
-	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, jasnosc);
-	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, jasnosc);
-	  		HAL_Delay(100);
+//	  	  if (jasnosc==1100){jasnosc=0;}
+//	  	  if(jasnosc!=1100)
+//	  	  {
+//	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, jasnosc);
+//	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, jasnosc);
+//	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, jasnosc);
+//	  		HAL_Delay(100);
 	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
 	 	  	  {
 	 		  	  BH1750_lux_int_1 = BH1750_lux_1;
@@ -157,17 +152,17 @@ int main(void)
 	 	  	  	 HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
 	 	  	  	  HAL_Delay(200);
 */
-	 		  	 size = sprintf(buffer, "%d, %d;\n", BH1750_lux_int_1,jasnosc);
+	 		  	 size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,jasnosc);
 	 		  	 HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
 
 	 		  	// size = sprintf(buffer, ", %d\n\r", jasnosc);
 	 		  	 //HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
-	 		  	 HAL_Delay(100);
+	 		  	 HAL_Delay(1000);
 
-	 	  	  	jasnosc=jasnosc+50;
+	 	  	  	//jasnosc=jasnosc+50;
 	 	  	    //HAL_Delay(1000);
 	           }
-	  	  }
+//	  	  }
 
     /* USER CODE END WHILE */
 
@@ -236,6 +231,8 @@ void SystemClock_Config(void)
 //! przerwanie od USARTA sterujące tymczasowo diodami na płytce
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+	if(huart->Instance == USART3)
+	{
 	/*if(rx_buff[3]=='R')
 		{
 		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
@@ -251,37 +248,59 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 
 	char value1[3];
-    char value2[3];
-	char value3[3];
-	int value_i1,value_i2,value_i3;
+//   char value2[3];
+//	char value3[3];
+	int value_i1;//,value_i2,value_i3;
 	// HAL_UART_Receive(&huart3, &msg, 12, 100);//odebranie znaku
 
-	value1[0] = msg[1];
-	value1[1] = msg[2];
-	value1[2] = msg[3];
-
-	value2[0] = msg[5];
-	value2[1] = msg[6];
-	value2[2] = msg[7];
-
-	value3[0] = msg[9];
-	value3[1] = msg[10];
-	value3[2] = msg[11];
-
-	value_i1 = 10*(atoi(msg[1])*100+atoi(msg[2])*10+atoi(msg[3]));
-	value_i2 = 10*(atoi(msg[5])*100+atoi(msg[6])*10+atoi(msg[7]));
-	value_i3 = 10*(atoi(msg[9])*100+atoi(msg[10])*10+atoi(msg[11]));
-
+	value1[0] = msg[0];
+	value1[1] = msg[1];
+	value1[2] = msg[2];
 
 	value_i1 = 10*(atoi(value1));
-	value_i2 = 10*(atoi(value2));
-	value_i3= 10*(atoi(value3));
+
+
+	if(atoi(value1) == 999) //Night mode on
+	{
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
+		NightMode=4;
+		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		size=sprintf(buffer,"NIGHT MODE ON\n\r");
+		HAL_UART_Transmit_IT(&huart3, buffer, size);
+	}
+	if(atoi(value1) == 998) //Night mode off
+	{
+		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
+		NightMode=10;
+		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		size=sprintf(buffer,"NIGHT MODE OFF\n\r");
+		HAL_UART_Transmit_IT(&huart3, buffer, size);
+	}
+	if(atoi(value1) == 997) //State check
+	{
+		if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
+		{
+			BH1750_lux_int_1 = BH1750_lux_1;
+		}
+		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,value_i1);
+		HAL_UART_Transmit_IT(&huart3,buffer, size);
+	}
+	if(atoi(value1) >100 && atoi(value1) < 997)
+	{
+		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+		size=sprintf(buffer,"WRONG VALUE\n\r");
+		HAL_UART_Transmit_IT(&huart3, buffer, size);
+	}
+
+
 
 __HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, value_i1);
-__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, value_i2);
-__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, value_i3);
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, value_i1*NightMode/10);
+__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, value_i1*NightMode/10);
 
-HAL_UART_Receive_IT(&huart3, msg, 12);
+HAL_UART_Receive_IT(&huart3, msg, 3);
+	}
 }
 
 /* USER CODE END 4 */
