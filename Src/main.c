@@ -53,19 +53,14 @@
 
 /* USER CODE BEGIN PV */
 float BH1750_lux_1;
-int zmienna = 0;
 char msg[3];
-uint8_t rx_buff[4]; /**< bufor do wysylania */
-uint8_t tx_buff[4];	/**< bufor do odbioru */
-int n; /**< długosc ciagu przy USART_TX */
-int jasnosc=0;
 int NightMode=10;
-int wypelnienie = 50;
 int BH1750_lux_int_1;
 char buffer[40];
 uint8_t size;
 float J_z, J_f;
 int wyp;
+int pom=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -121,7 +116,6 @@ int main(void)
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_2);
   HAL_TIM_PWM_Start(&htim1, TIM_CHANNEL_3);
-  //HAL_TIM_Base_Start_IT(&htim2);
 
   /* USER CODE END 2 */
 
@@ -130,26 +124,11 @@ int main(void)
   J_z=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
   while (1)
   {
-      //! testowa obsługa USARTA od przycisku
-//	  if(HAL_GPIO_ReadPin(USER_Btn_GPIO_Port, USER_Btn_Pin)==GPIO_PIN_SET)
-//	  {
-//		  n=sprintf(tx_buff,"test");
-//		  HAL_UART_Transmit_IT(&huart3, tx_buff, n);
-//		  HAL_Delay(200);
-//	  }
-	 // HAL_UART_Receive_IT(&huart3, &msg, 12);
-//	  	  if (jasnosc==1100){jasnosc=0;}
-//	  	  if(jasnosc!=1100)
-//	  	  {
-//	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, jasnosc);
-//	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, jasnosc);
-//	  		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, jasnosc);
-//	  		HAL_Delay(100);
 	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
 	 	  {
 	 		 BH1750_lux_int_1 = BH1750_lux_1;
 
-	 		 J_f=J_z*((2000-BH1750_lux_1)/2000);
+	 		 J_f=J_z*((1000-BH1750_lux_1)/1000);
 	 		 wyp=J_f/(0.75);
 
 	 		 if(wyp>0 && wyp <=1000)
@@ -172,31 +151,13 @@ int main(void)
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	 		 }
-	 		//HAL_Delay(10);
-	 		//size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,wyp);
-	 		//HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
-
+	 		 if(pom==1)
+	 		 {
+	 			 size = sprintf(buffer, "%d,%d,%d;\n\r",(int)J_z,BH1750_lux_int_1,wyp);
+	 			 HAL_UART_Transmit_IT(&huart3, buffer, size);
+	 			 HAL_Delay(10);
+	 		 }
 	 	  }
-	 	  	  //{
-	 		  	  //BH1750_lux_int_1 = BH1750_lux_1;
-	 	  		  //size = sprintf(buffer, "BH1750 Lux: %d", BH1750_lux_int_1);
-	 	  	  	  //HAL_UART_Transmit_IT(&huart3,buffer, size);
-
-	 	  	  	 //size = sprintf(buffer, ", %d\n\r", jasnosc);
-	 	  	  	 //HAL_UART_Transmit_IT(&huart3, buffer, size);
-	 	  	  	 //HAL_Delay(200);
-
-	 		  	// size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,jasnosc);
-	 		  	// HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
-
-	 		  	// size = sprintf(buffer, ", %d\n\r", jasnosc);
-	 		  	 //HAL_UART_Transmit(&huart3, (uint8_t*)buffer, size, 200);
-	 		  	 //HAL_Delay(1000);
-
-	 	  	  	//jasnosc=jasnosc+50;
-	 	  	    //HAL_Delay(1000);
-	        //   }
-//	  	  }
 
     /* USER CODE END WHILE */
 
@@ -267,25 +228,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart->Instance == USART3)
 	{
-	/*if(rx_buff[3]=='R')
-		{
-		HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-		}
-	if(rx_buff[3]=='B')
-		{
-			HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-		}
-	if(rx_buff[3]=='G')
-		{
-			HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-		}*/
-
 
 	char value1[3];
-//   char value2[3];
-//	char value3[3];
-	int value_i1;//,value_i2,value_i3;
-	// HAL_UART_Receive(&huart3, &msg, 12, 100);//odebranie znaku
+
+	int value_i1;
 
 	value1[0] = msg[0];
 	value1[1] = msg[1];
@@ -330,18 +276,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		size = sprintf(buffer, "%d, %d;\n\r", BH1750_lux_int_1,state);
 		HAL_UART_Transmit_IT(&huart3,buffer, size);
 	}
-	if(atoi(value1) >100 && atoi(value1) < 997)
+	if(atoi(value1) == 996) //State check
+		{
+			pom^=1;
+		}
+	if(atoi(value1) >100 && atoi(value1) < 996)
 	{
 		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
 		size=sprintf(buffer,"WRONG VALUE\n\r");
 		HAL_UART_Transmit_IT(&huart3, buffer, size);
 	}
-
-
-
-//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, value_i1);
-//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, value_i1*NightMode/10);
-//__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, value_i1*NightMode/10);
 
 HAL_UART_Receive_IT(&huart3, msg, 3);
 	}
