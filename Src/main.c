@@ -52,16 +52,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float BH1750_lux_1; /*!< warość odczytu z czujnika */
-int BH1750_lux_int_1; /*!< wartość odczytu z czujnika przekonwertowany do int */
-uint8_t size;  /*!< rozmiar wiadomości z sprintf */
-char msg[3]; /*!< bufor odbioru USART */
-char buffer[40];  /*!< bufor wysyłu USART */
-int NightMode=10; /*!< zmienna pomocnicza do PWM trybu nocnego */
-float J_z;  /*!< jasnosc zadana */
-float J_f;  /*!< jasnosc wyliczona */
-int wyp; /*!< wypełnienie PWM */
-int pom=0; /*!< warość odczytu z czujnika */
+float BH1750_lux_1; //!< warość odczytu z czujnika 
+int BH1750_lux_int_1; //!< wartość odczytu z czujnika przekonwertowany do int 
+uint8_t size;  //!< rozmiar wiadomości z sprintf 
+char msg[3]; //!< bufor odbioru USART
+char buffer[40];  //!< bufor wysyłu USART 
+int NightMode=10; //!< zmienna pomocnicza do PWM trybu nocnego 
+float J_z;  //!< jasnosc zadana 
+float J_f;  //!< jasnosc wyliczona 
+int wyp; //!< wypełnienie PWM 
+int pom=0; //!< sterująca do wyświetlania podglądu zmiennych
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/

@@ -1,0 +1,148 @@
+\hypertarget{main_8c}{}\doxysection{main.\+c File Reference}
+\label{main_8c}\index{main.c@{main.c}}
+
+
+\+: Main program body  
+
+
+{\ttfamily \#include \char`\"{}main.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}i2c.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tim.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}usart.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}usb\+\_\+otg.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}gpio.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}bh1750.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}stdio.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}string.\+h\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}math.\+h\char`\"{}}\newline
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{main_8c_a70af21c671abfcc773614a9a4f63d920}{System\+Clock\+\_\+\+Config}} (void)
+\begin{DoxyCompactList}\small\item\em System Clock Configuration. \end{DoxyCompactList}\item 
+int \mbox{\hyperlink{main_8c_a840291bc02cba5474a4cb46a9b9566fe}{main}} (void)
+\begin{DoxyCompactList}\small\item\em The application entry point. \end{DoxyCompactList}\item 
+void \mbox{\hyperlink{main_8c_ae494a9643f29b87d6d81e5264e60e57b}{H\+A\+L\+\_\+\+U\+A\+R\+T\+\_\+\+Rx\+Cplt\+Callback}} (U\+A\+R\+T\+\_\+\+Handle\+Type\+Def $\ast$huart)
+\item 
+void \mbox{\hyperlink{main_8c_a1730ffe1e560465665eb47d9264826f9}{Error\+\_\+\+Handler}} (void)
+\begin{DoxyCompactList}\small\item\em This function is executed in case of error occurrence. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{main_8c_a175c84e173f26d49e3219b1c3cca364a}\label{main_8c_a175c84e173f26d49e3219b1c3cca364a}} 
+float \mbox{\hyperlink{main_8c_a175c84e173f26d49e3219b1c3cca364a}{B\+H1750\+\_\+lux\+\_\+1}}
+\begin{DoxyCompactList}\small\item\em warość odczytu z czujnika \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_a9b03ff2c9bd3a86eabe4c5247c948314}\label{main_8c_a9b03ff2c9bd3a86eabe4c5247c948314}} 
+int \mbox{\hyperlink{main_8c_a9b03ff2c9bd3a86eabe4c5247c948314}{B\+H1750\+\_\+lux\+\_\+int\+\_\+1}}
+\begin{DoxyCompactList}\small\item\em wartość odczytu z czujnika przekonwertowany do int \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_ae5dc6ffcd9b7605c7787791e40cc6bb0}\label{main_8c_ae5dc6ffcd9b7605c7787791e40cc6bb0}} 
+uint8\+\_\+t \mbox{\hyperlink{main_8c_ae5dc6ffcd9b7605c7787791e40cc6bb0}{size}}
+\begin{DoxyCompactList}\small\item\em rozmiar wiadomości z sprintf \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_aa25f12d4c8b12de93f169687b4a71c9f}\label{main_8c_aa25f12d4c8b12de93f169687b4a71c9f}} 
+char \mbox{\hyperlink{main_8c_aa25f12d4c8b12de93f169687b4a71c9f}{msg}} \mbox{[}3\mbox{]}
+\begin{DoxyCompactList}\small\item\em bufor odbioru U\+S\+A\+RT \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_ac85a6f20878c3a65aa684302e91265d2}\label{main_8c_ac85a6f20878c3a65aa684302e91265d2}} 
+char \mbox{\hyperlink{main_8c_ac85a6f20878c3a65aa684302e91265d2}{buffer}} \mbox{[}40\mbox{]}
+\begin{DoxyCompactList}\small\item\em bufor wysyłu U\+S\+A\+RT \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_a7d2e6b5eee212d4fd9c247ec105fa9dd}\label{main_8c_a7d2e6b5eee212d4fd9c247ec105fa9dd}} 
+int \mbox{\hyperlink{main_8c_a7d2e6b5eee212d4fd9c247ec105fa9dd}{Night\+Mode}} =10
+\begin{DoxyCompactList}\small\item\em zmienna pomocnicza do P\+WM trybu nocnego \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_a88b18ed92cbfb890899e5bc89f1fd19c}\label{main_8c_a88b18ed92cbfb890899e5bc89f1fd19c}} 
+float \mbox{\hyperlink{main_8c_a88b18ed92cbfb890899e5bc89f1fd19c}{J\+\_\+z}}
+\begin{DoxyCompactList}\small\item\em jasnosc zadana \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_aefaf33c43478ec3be0796e229b4e92d0}\label{main_8c_aefaf33c43478ec3be0796e229b4e92d0}} 
+float \mbox{\hyperlink{main_8c_aefaf33c43478ec3be0796e229b4e92d0}{J\+\_\+f}}
+\begin{DoxyCompactList}\small\item\em jasnosc wyliczona \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_ac019d7d61887a04fbc3a909c6e2a5d68}\label{main_8c_ac019d7d61887a04fbc3a909c6e2a5d68}} 
+int \mbox{\hyperlink{main_8c_ac019d7d61887a04fbc3a909c6e2a5d68}{wyp}}
+\begin{DoxyCompactList}\small\item\em wypełnienie P\+WM \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{main_8c_a2aeae7f5ac55000559a21ab81d2e9ad7}\label{main_8c_a2aeae7f5ac55000559a21ab81d2e9ad7}} 
+int \mbox{\hyperlink{main_8c_a2aeae7f5ac55000559a21ab81d2e9ad7}{pom}} =0
+\begin{DoxyCompactList}\small\item\em sterująca do wyświetlania podglądu zmiennych \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+\+: Main program body 
+
+\begin{DoxyAttention}{Attention}
+
+\end{DoxyAttention}
+\doxysubsubsection*{\begin{center}\copyright{} Copyright (c) 2020 S\+T\+Microelectronics. All rights reserved.\end{center} }
+
+This software component is licensed by ST under B\+SD 3-\/Clause license, the \char`\"{}\+License\char`\"{}; You may not use this file except in compliance with the License. You may obtain a copy of the License at\+: opensource.\+org/licenses/\+B\+S\+D-\/3-\/\+Clause 
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{main_8c_a1730ffe1e560465665eb47d9264826f9}\label{main_8c_a1730ffe1e560465665eb47d9264826f9}} 
+\index{main.c@{main.c}!Error\_Handler@{Error\_Handler}}
+\index{Error\_Handler@{Error\_Handler}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{Error\_Handler()}{Error\_Handler()}}
+{\footnotesize\ttfamily void Error\+\_\+\+Handler (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+This function is executed in case of error occurrence. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+\mbox{\Hypertarget{main_8c_ae494a9643f29b87d6d81e5264e60e57b}\label{main_8c_ae494a9643f29b87d6d81e5264e60e57b}} 
+\index{main.c@{main.c}!HAL\_UART\_RxCpltCallback@{HAL\_UART\_RxCpltCallback}}
+\index{HAL\_UART\_RxCpltCallback@{HAL\_UART\_RxCpltCallback}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{HAL\_UART\_RxCpltCallback()}{HAL\_UART\_RxCpltCallback()}}
+{\footnotesize\ttfamily void H\+A\+L\+\_\+\+U\+A\+R\+T\+\_\+\+Rx\+Cplt\+Callback (\begin{DoxyParamCaption}\item[{U\+A\+R\+T\+\_\+\+Handle\+Type\+Def $\ast$}]{huart }\end{DoxyParamCaption})}
+
+przerwanie od U\+S\+A\+R\+Ta włączenie trybu nocnego
+
+wyłączenie trybu nocnego
+
+sprawdzanie statusu przez użytkownika
+
+zabezpieczenie przed wartością spoza zakresu\mbox{\Hypertarget{main_8c_a840291bc02cba5474a4cb46a9b9566fe}\label{main_8c_a840291bc02cba5474a4cb46a9b9566fe}} 
+\index{main.c@{main.c}!main@{main}}
+\index{main@{main}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+The application entry point. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em int} & \\
+\hline
+\end{DoxyRetVals}
+Ustawienie używanych modułów komunikacji i P\+WM
+
+pętla główna
+
+domyślne ustawienie wartości P\+WM
+
+reakcja gdy podana warość wykracza poza zakres
+
+wyłączenie światła
+
+Wysłanie statusu po porcie szeregowym\mbox{\Hypertarget{main_8c_a70af21c671abfcc773614a9a4f63d920}\label{main_8c_a70af21c671abfcc773614a9a4f63d920}} 
+\index{main.c@{main.c}!SystemClock\_Config@{SystemClock\_Config}}
+\index{SystemClock\_Config@{SystemClock\_Config}!main.c@{main.c}}
+\doxysubsubsection{\texorpdfstring{SystemClock\_Config()}{SystemClock\_Config()}}
+{\footnotesize\ttfamily void System\+Clock\+\_\+\+Config (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})}
+
+
+
+System Clock Configuration. 
+
+
+\begin{DoxyRetVals}{Return values}
+{\em None} & \\
+\hline
+\end{DoxyRetVals}
+Configure L\+SE Drive Capability
+
+Configure the main internal regulator output voltage
+
+Initializes the C\+PU, A\+HB and A\+PB busses clocks
+
+Initializes the C\+PU, A\+HB and A\+PB busses clocks
