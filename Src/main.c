@@ -52,15 +52,16 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-float BH1750_lux_1;
-char msg[3];
-int NightMode=10;
-int BH1750_lux_int_1;
-char buffer[40];
-uint8_t size;
-float J_z, J_f;
-int wyp;
-int pom=0;
+float BH1750_lux_1; /*!< warość odczytu z czujnika */
+int BH1750_lux_int_1; /*!< wartość odczytu z czujnika przekonwertowany do int */
+uint8_t size;  /*!< rozmiar wiadomości z sprintf */
+char msg[3]; /*!< bufor odbioru USART */
+char buffer[40];  /*!< bufor wysyłu USART */
+int NightMode=10; /*!< zmienna pomocnicza do PWM trybu nocnego */
+float J_z;  /*!< jasnosc zadana */
+float J_f;  /*!< jasnosc wyliczona */
+int wyp; /*!< wypełnienie PWM */
+int pom=0; /*!< warość odczytu z czujnika */
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -109,7 +110,9 @@ int main(void)
   MX_I2C2_Init();
   MX_TIM3_Init();
   MX_TIM1_Init();
-  /* USER CODE BEGIN 2 */
+  /* USER CODE BEGIN 2 */ 
+  
+  /*! Ustawienie używanych modułów komunikacji i PWM */ 
   HAL_UART_Receive_IT(&huart3, msg, 3);
   BH1750_Init(&hi2c2);
   BH1750_SetMode(CONTINUOUS_HIGH_RES_MODE_2);
@@ -121,7 +124,9 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  J_z=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
+  
+  J_z=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1); 
+  /*! pętla główna */ 
   while (1)
   {
 	 	  if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
@@ -130,13 +135,15 @@ int main(void)
 
 	 		 J_f=J_z*((1000-BH1750_lux_1)/1000);
 	 		 wyp=J_f/(0.75);
-
+			
+			/*! domyślne ustawienie wartości PWM */ 
 	 		 if(wyp>0 && wyp <=1000)
 	 		 {
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_1, wyp);
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	 		 }
+			 /*! reakcja gdy podana warość wykracza poza zakres */ 
 	 		 else if(wyp>1000)
 	 		 {
 	 			 wyp=1000;
@@ -144,6 +151,7 @@ int main(void)
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	 		 }
+			 /*! wyłączenie światła */ 
 	 		 else
 	 		 {
 	 			 wyp=0;
@@ -151,6 +159,7 @@ int main(void)
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
 	 			__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	 		 }
+			 /*! Wysłanie statusu po porcie szeregowym */ 
 	 		 if(pom==1)
 	 		 {
 	 			 size = sprintf(buffer, "%d,%d,%d;\n\r",(int)J_z,BH1750_lux_int_1,wyp);
@@ -223,13 +232,14 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-//! przerwanie od USARTA sterujące tymczasowo diodami na płytce
+
+/*! przerwanie od USARTa*/ 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 	if(huart->Instance == USART3)
 	{
 
-	char value1[3];
+	char value1[3]; 
 
 	int value_i1;
 
@@ -244,7 +254,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		J_z=value_i1;
 	}
 
-	if(atoi(value1) == 999) //Night mode on
+	/*! włączenie trybu nocnego */ 
+	if(atoi(value1) == 999) 
 	{
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_SET);
 		NightMode=4;
@@ -255,7 +266,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	}
-	if(atoi(value1) == 998) //Night mode off
+	/*! wyłączenie trybu nocnego */
+	if(atoi(value1) == 998)
 	{
 		HAL_GPIO_WritePin(LD2_GPIO_Port, LD2_Pin, GPIO_PIN_RESET);
 		NightMode=10;
@@ -266,7 +278,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_2, wyp*NightMode/10);
 		__HAL_TIM_SET_COMPARE(&htim1, TIM_CHANNEL_3, wyp*NightMode/10);
 	}
-	if(atoi(value1) == 997) //State check
+	/*! sprawdzanie statusu przez użytkownika */
+	if(atoi(value1) == 997)
 	{
 		if(BH1750_OK == BH1750_ReadLight(&BH1750_lux_1))
 		{
@@ -280,6 +293,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 		{
 			pom^=1;
 		}
+	/*! zabezpieczenie przed wartością spoza zakresu */ 
 	if(atoi(value1) >100 && atoi(value1) < 996)
 	{
 		value_i1=__HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
